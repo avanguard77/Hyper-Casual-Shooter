@@ -18,6 +18,7 @@ public class PlayerMoving : MonoBehaviour
     private PlayerAnimation playerAnimation;
 
     [Header("Movement")] [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float slowScaleTime = 1f;
 
     private float warzoneTimer;
 
@@ -76,6 +77,8 @@ public class PlayerMoving : MonoBehaviour
         state = State.Warzone;
         thisWarzone = warzone;
 
+        Time.timeScale = slowScaleTime;
+
         warzoneTimer = 0;
         playerAnimation.PlayAnimation(thisWarzone.GetAnimation(), thisWarzone.GetAnimationSpeed());
     }
@@ -97,5 +100,6 @@ public class PlayerMoving : MonoBehaviour
         state = State.Running;
         playerAnimation.PlayAnimation("Run", 1);
         thisWarzone = null;
+        Time.timeScale = 1;
     }
 }
