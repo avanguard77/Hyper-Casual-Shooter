@@ -16,6 +16,16 @@ public class PlayerAnimation : MonoBehaviour
 
     public void StartRunningAnimation()
     {
-        animator.Play("Run");
+        PlayAnimation("Run");
+    }
+
+    public void PlayAnimation(string animation)
+    {
+        animator.Play(animation);
+    }
+    public void PlayAnimation(string animation,float animationSpeed)
+    {
+        animator.speed = animationSpeed;
+        animator.Play(animation);
     }
 }

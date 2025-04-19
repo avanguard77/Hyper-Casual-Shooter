@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.Splines;
 
 public class PlayerMoving : MonoBehaviour
 {
@@ -9,6 +11,7 @@ public class PlayerMoving : MonoBehaviour
     {
         Idle,
         Running,
+        Warzone
     }
 
     [Header("References")] [SerializeField]
@@ -16,6 +19,9 @@ public class PlayerMoving : MonoBehaviour
 
     [Header("Movement")] [SerializeField] private float moveSpeed = 5f;
 
+    private float warzoneTimer;
+
+    private Warzone thisWarzone;
     private State state;
 
     private void Start()
@@ -31,6 +37,7 @@ public class PlayerMoving : MonoBehaviour
         {
             StartRunning();
         }
+
         ManageState();
     }
 
@@ -42,6 +49,9 @@ public class PlayerMoving : MonoBehaviour
                 break;
             case State.Running:
                 MovePlayer();
+                break;
+            case State.Warzone:
+                ManageStateWarzone();
                 break;
         }
     }
@@ -56,5 +66,36 @@ public class PlayerMoving : MonoBehaviour
     {
         playerAnimation.StartRunningAnimation();
         state = State.Running;
+    }
+
+    public void EnteredWarzoneCallBack(Warzone warzone)
+    {
+        if (thisWarzone != null)
+            return;
+
+        state = State.Warzone;
+        thisWarzone = warzone;
+
+        warzoneTimer = 0;
+        playerAnimation.PlayAnimation(thisWarzone.GetAnimation(), thisWarzone.GetAnimationSpeed());
+    }
+
+    private void ManageStateWarzone()
+    {
+        warzoneTimer += Time.deltaTime / thisWarzone.GetDuration();
+
+        transform.position = thisWarzone.GetPlayerSpline().EvaluatePosition(warzoneTimer);
+
+        if (warzoneTimer >= 1)
+        {
+            ExitWarzone();
+        }
+    }
+
+    private void ExitWarzone()
+    {
+        state = State.Running;
+        playerAnimation.PlayAnimation("Run", 1);
+        thisWarzone = null;
     }
 }
